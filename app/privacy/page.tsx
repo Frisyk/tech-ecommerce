@@ -1,9 +1,7 @@
-import { SiteHeader } from "@/components/site-header"
 
 export default function PrivacyPolicyPage() {
   return (
     <>
-      <SiteHeader />
       <main className="container py-12 md:py-16 lg:py-20">
         <div className="mx-auto max-w-3xl">
           <h1 className="text-4xl font-bold tracking-tight mb-8">Kebijakan Privasi</h1>

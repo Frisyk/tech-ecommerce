@@ -46,7 +46,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
 
   return (
     <>
-      <SiteHeader user={user} />
+       
       <main className="container py-12">
         {/* Header Kategori */}
         <div className="mb-10">

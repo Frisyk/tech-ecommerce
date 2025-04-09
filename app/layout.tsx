@@ -6,7 +6,8 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 // import { SupabaseProvider } from "@/lib/supabase-provider"
 import { SiteFooter } from "@/components/site-footer"
-
+import { SiteHeader } from "@/components/site-header"
+import { getProfile } from "@/lib/action/user"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
@@ -15,17 +16,19 @@ export const metadata: Metadata = {
     generator: 'v0.dev'
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const user = await (await getProfile()).user
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {/* <SupabaseProvider> */}
             <div className="flex min-h-screen flex-col">
+              <SiteHeader user={user} />
               {children}
               <SiteFooter />
             </div>

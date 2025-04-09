@@ -162,7 +162,6 @@ export default function CheckoutPage() {
   
   return (
     <>
-      <SiteHeader user={null} />
       <main className="container py-10 md:py-12">
         <div className="mb-8">
           <Button variant="ghost" asChild className="mb-2">

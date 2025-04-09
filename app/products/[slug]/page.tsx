@@ -64,7 +64,7 @@ export default async function ProductPage({ params }: { params: Params }) {
   
     return (
       <>
-        <SiteHeader user={user} />
+         
         <main className="container py-10">
           <Button variant="ghost" className="mb-6" asChild>
             <a href="/products">

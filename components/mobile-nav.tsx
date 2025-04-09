@@ -7,12 +7,11 @@ import { Home, ShoppingBag, LayoutGrid, Info, Phone, User, LogOut } from "lucide
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { useSupabase } from "@/lib/supabase-provider"
+import { getProfile, handleSignOut } from "@/lib/action/user"
 
 export function MobileNav() {
   const pathname = usePathname()
-  const { user, supabase } = useSupabase()
-
+  const user = getProfile().then((res) => res.user)
   const isAdmin = pathname.startsWith("/admin")
 
   const navItems = [
@@ -22,10 +21,6 @@ export function MobileNav() {
     { name: "About", href: "/about", icon: Info },
     { name: "Contact", href: "/contact", icon: Phone },
   ]
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut()
-  }
 
   return (
     <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10">
@@ -43,7 +38,7 @@ export function MobileNav() {
             {item.name}
           </Link>
         ))}
-        {user?.id && (
+        {user?.then((user) => user?.id && (
           <>
             <Link
               href="/account"
@@ -76,8 +71,8 @@ export function MobileNav() {
               Sign out
             </Button>
           </>
-        )}
-        {!user?.id && (
+        ))}
+        {!user?.then((user) => user?.id) && (
           <Link href="/login">
             <Button variant="default" className="w-full">
               Sign in

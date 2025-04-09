@@ -1,3 +1,4 @@
+"use server"
 import { redirect } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -18,15 +19,15 @@ export default async function AdminDashboard() {
 
   
   // Verifikasi apakah pengguna memiliki role admin
-  // const { data: profile, error: profileError } = await supabase
-  //   .from("profiles")
-  //   .select("is_admin")
-  //   .eq("id", user.id)
-  //   .single()
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("is_admin")
+    .eq("id", user.id)
+    .single()
   
-  // if (profileError || !profile || !profile.is_admin) {
-  //   redirect("/") // Redirect non-admin ke halaman utama
-  // }
+  if (profileError || !profile || !profile.is_admin) {
+    redirect("/") // Redirect non-admin ke halaman utama
+  }
 
   // Fetch dashboard stats - menggunakan 'count' pada response
   const { count: productCount } = await supabase
@@ -69,7 +70,7 @@ export default async function AdminDashboard() {
 
   return (
     <>
-      <SiteHeader user={user} />
+       
       <div className="container py-10">
         <div className="flex-1 space-y-6">
           <div className="flex items-center justify-between">

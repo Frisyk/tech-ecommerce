@@ -9,7 +9,6 @@ import { formatPrice } from "@/lib/utils"
 
 export default async function Home() {
   const supabase = await createServerSupabaseClient()
-  const { data: profile } = await supabase.auth.getUser()
   
   // Fetch featured products
   const { data: featuredProducts } = await supabase
@@ -35,7 +34,6 @@ export default async function Home() {
 
   return (
     <>
-      <SiteHeader user={profile.user}  />
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative overflow-hidden">

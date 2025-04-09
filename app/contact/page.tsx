@@ -1,11 +1,9 @@
-import { SiteHeader } from "@/components/site-header";
 import { Mail, Phone, MapPin } from "lucide-react";
 // import { ContactForm } from "@/components/contact"; // Uncomment jika komponen contact.tsx mengekspor ContactForm
 
 export default function ContactPage() {
   return (
     <>
-      <SiteHeader />
       <main className="container py-12 md:py-16 lg:py-20">
         <div className="mb-12 text-center">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
