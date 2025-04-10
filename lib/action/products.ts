@@ -62,7 +62,7 @@ export async function getAllProducts() {
   // Optional: kamu bisa ubah nama relasi agar konsisten dengan TypeScript types
   const products = (data || []).map((product) => ({
     ...product,
-    category: product.categories[0].name ?? "",
+    category: product.categories.name ?? "",
     images: product.product_images ?? [],
   }))
 

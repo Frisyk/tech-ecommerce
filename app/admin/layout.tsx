@@ -21,7 +21,6 @@ export default async function AdminLayout({
 
   // Check if user is admin
   const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
-  console.log("profile", profile);
   if (!profile?.is_admin) {
     redirect("/")
   }
