@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 import { getProfile } from "@/lib/action/user"
+import { StorageInitializer } from "@/components/storage-initializer"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
@@ -28,6 +29,7 @@ export default async function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {/* <SupabaseProvider> */}
             <div className="flex min-h-screen flex-col">
+            <StorageInitializer />
               <SiteHeader user={user} />
               {children}
               <SiteFooter />

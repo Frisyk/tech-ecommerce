@@ -4,7 +4,6 @@ import Image from "next/image";
 export default function AboutPage() {
   return (
     <>
-      <SiteHeader />
       <main className="container py-12 md:py-16 lg:py-20">
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">

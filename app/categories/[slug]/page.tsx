@@ -6,15 +6,17 @@ import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { formatPrice } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { getProfile } from "@/lib/action/user";
+type Params = Promise<{ slug: string }>
 
-export default async function CategoryPage({ params }: { params: { slug: string } }) {
+export default async function CategoryPage({ params }: { params: Params }) {
   const supabase = await createServerSupabaseClient();
-  const user = (await getProfile()).user
+
+  const slug = (await params).slug
   // Ambil data kategori
   const { data: category, error: categoryError } = await supabase
     .from("categories")
     .select("id, name, slug, description, image_url")
-    .eq("slug", params.slug)
+    .eq("slug", slug)
     .single();
 
   if (categoryError || !category) {

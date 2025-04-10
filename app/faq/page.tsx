@@ -1,4 +1,3 @@
-import { SiteHeader } from "@/components/site-header"
 import {
   Accordion,
   AccordionContent,
@@ -63,7 +62,6 @@ const faqs = [
 export default function FaqPage() {
   return (
     <>
-      <SiteHeader />
       <main className="container py-12 md:py-16 lg:py-20">
         <div className="mx-auto max-w-4xl">
           <div className="text-center mb-12">

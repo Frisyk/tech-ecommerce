@@ -72,7 +72,7 @@ export default async function Home() {
               {featuredProducts?.map((product) => (
                 <Link
                   key={product.id}
-                  href={`/products/${product.slug}`}
+                  href={`/products/${product.id}`}
                   className="group rounded-lg border bg-card shadow-sm product-card-hover"
                 >
                   <div className="aspect-square overflow-hidden rounded-t-lg bg-muted">

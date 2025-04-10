@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation'
 import { CheckCircle2, ShoppingBag, ChevronRight } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { SiteHeader } from '@/components/site-header'
 import { useCartStore } from '@/store/cart-store'
 
 export default function CheckoutSuccessPage() {
@@ -24,7 +23,6 @@ export default function CheckoutSuccessPage() {
   
   return (
     <>
-      <SiteHeader user={null} />
       <main className="container max-w-3xl py-16 md:py-24">
         <div className="flex flex-col items-center text-center">
           <div className="mb-6">

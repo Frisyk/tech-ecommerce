@@ -1,63 +1,38 @@
-import Link from "next/link"
-import { Plus } from "lucide-react"
+// app/admin/categories/page.tsx
+import Link from "next/link";
+import { Plus } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { createServerSupabaseClient } from "@/lib/supabase-server"
-import { DataTable } from "@/components/admin/data-table"
+import { Button } from "@/components/ui/button";
+import { DataTable } from "@/components/admin/data-table"; // Pastikan path ini benar
+import { getAllCategories } from "@/lib/action/category"; // Pastikan path ini benar
+import { categoryColumns, type CategoryWithProductCount } from "./column"; // <-- Import kolom dan tipe
+
+// Tipe data asli yang dikembalikan oleh getAllCategories (sebelum menghitung count)
+// Sesuaikan ini dengan apa yang sebenarnya dikembalikan oleh action Anda
+interface CategoryFromDB {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  products?: Array<{ id: string }>; // Asumsi 'products' adalah relasi untuk menghitung
+  // tambahkan field lain jika ada
+}
 
 export default async function CategoriesPage() {
-    const supabase = await createServerSupabaseClient()
+  // 1. Ambil data di Server Component
+  const categories: CategoryFromDB[] | null = await getAllCategories();
 
-  const { data: categories } = await supabase
-    .from("categories")
-    .select(`
-      id,
-      name,
-      slug,
-      description,
-      products:products (id)
-    `)
-    .order("name")
-
-  // Count products in each category
-  const categoriesWithCount = categories?.map((category) => ({
-    ...category,
-    product_count: category.products?.length || 0,
-  }))
-
-  const columns = [
-    {
-      accessorKey: "name",
-      header: "Name",
-    },
-    {
-      accessorKey: "slug",
-      header: "Slug",
-    },
-    {
-      accessorKey: "description",
-      header: "Description",
-      cell: ({ row }: { row: any }) => (
-        <div className="max-w-[300px] truncate">{row.getValue("description") || "—"}</div>
-      ),
-    },
-    {
-      accessorKey: "product_count",
-      header: "Products",
-    },
-    {
-      id: "actions",
-      cell: ({ row }: { row: any }) => (
-        <div className="flex items-center gap-2">
-          <Link href={`/admin/categories/${row.original.id}`}>
-            <Button variant="ghost" size="sm">
-              Edit
-            </Button>
-          </Link>
-        </div>
-      ),
-    },
-  ]
+  // 2. Transformasi data (menghitung jumlah produk) di Server Component
+  // Pastikan struktur data cocok dengan tipe CategoryWithProductCount yang digunakan di columns.ts
+  const categoriesWithCount: CategoryWithProductCount[] = categories
+    ? categories.map((category) => ({
+        id: category.id,
+        name: category.name,
+        slug: category.slug,
+        description: category.description,
+        product_count: category.products?.length || 0, // Hitung jumlah produk
+      }))
+    : []; // Kembalikan array kosong jika categories null
 
   return (
     <div className="space-y-4">
@@ -71,8 +46,9 @@ export default async function CategoriesPage() {
         </Link>
       </div>
       <div className="rounded-md border">
-        <DataTable columns={columns} data={categoriesWithCount || []} />
+        {/* 3. Gunakan DataTable (Client Component) dengan kolom yang diimpor dan data yang sudah ditransformasi */}
+        <DataTable columns={categoryColumns} data={categoriesWithCount} />
       </div>
     </div>
-  )
+  );
 }
