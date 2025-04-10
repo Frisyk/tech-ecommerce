@@ -47,8 +47,6 @@ export interface ProductWithCategoryAndImages {
 // --- Akhir Definisi Tipe Data ---
 
 
-// --- Definisi Kolom ---
-// Gunakan tipe ColumnDef<ProductWithCategoryAndImages> untuk type safety
 export const productColumns: ColumnDef<ProductWithCategoryAndImages>[] = [
   // Kolom Gambar
   {

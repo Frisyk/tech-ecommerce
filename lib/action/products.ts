@@ -32,6 +32,43 @@ async function getSupabase() {
 
 // Get all products with category name AND first image URL (Updated from previous response)
 // lib/action/products.ts
+// export async function getAllProducts() {
+//   const supabase = await getSupabase()
+
+//   const { data, error } = await supabase
+//     .from("products")
+//     .select(`
+//       id,
+//       name,
+//       price,
+//       inventory_quantity,
+//       is_active,
+//       categories (
+//         name
+//       ),
+//       product_images (
+//         url,
+//         position
+//       ),
+//       created_at
+//     `)
+//     .order("created_at", { ascending: false })
+
+//   if (error) {
+//     console.error("Error fetching products:", error.message)
+//     throw new Error(`Failed to fetch products: ${error.message}`)
+//   }
+
+//   // Optional: kamu bisa ubah nama relasi agar konsisten dengan TypeScript types
+//   const products = (data || []).map((product) => ({
+//     ...product,
+//     category: product.categories[0].name ?? "",
+//     images: product.product_images ?? [],
+//   }))
+
+//   return products
+// }
+
 export async function getAllProducts() {
   const supabase = await getSupabase()
 
@@ -59,17 +96,14 @@ export async function getAllProducts() {
     throw new Error(`Failed to fetch products: ${error.message}`)
   }
 
-  // Optional: kamu bisa ubah nama relasi agar konsisten dengan TypeScript types
   const products = (data || []).map((product) => ({
     ...product,
-    category: product.categories.name ?? "",
+    category: product.categories?.[0]?.name ?? "",
     images: product.product_images ?? [],
-  }))
+  }));
 
   return products
 }
-
-
 
 // Get product by ID (include images) (Updated from previous response)
 export async function getProductById(id: string) {
@@ -93,6 +127,8 @@ export async function getProductById(id: string) {
       }
       throw new Error(`Failed to fetch product ${id}: ${error.message}`);
     }
+    console.log(data);
+    
     return data
 }
 
@@ -239,7 +275,6 @@ export async function uploadImageToSupabase(
 
     return { publicUrl: publicUrlData.publicUrl, filePath }; // Return both URL and path
 }
-
 
 // --- Create product with images (Mainly Modified Function) ---
 export async function createProductWithImages(formData: FormData) {

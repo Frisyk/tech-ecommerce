@@ -29,7 +29,7 @@ export default async function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {/* <SupabaseProvider> */}
             <div className="flex min-h-screen flex-col">
-            <StorageInitializer />
+            {/* <StorageInitializer /> */}
               <SiteHeader user={user} />
               {children}
               <SiteFooter />

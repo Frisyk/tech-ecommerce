@@ -5,7 +5,7 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/admin/data-table"; // Pastikan path ini benar
 import { getAllCategories } from "@/lib/action/category"; // Pastikan path ini benar
-import { categoryColumns, type CategoryWithProductCount } from "./column"; // <-- Import kolom dan tipe
+import { categoryColumns, CategoryWithProductCount } from "./column"; // <-- Import kolom dan tipe
 
 // Tipe data asli yang dikembalikan oleh getAllCategories (sebelum menghitung count)
 // Sesuaikan ini dengan apa yang sebenarnya dikembalikan oleh action Anda
@@ -14,7 +14,8 @@ interface CategoryFromDB {
   name: string;
   slug: string;
   description: string | null;
-  products?: Array<{ id: string }>; // Asumsi 'products' adalah relasi untuk menghitung
+  products?: Array<{ id: string }>;
+  image_url: string; // Asumsi 'products' adalah relasi untuk menghitung
   // tambahkan field lain jika ada
 }
 
@@ -30,7 +31,8 @@ export default async function CategoriesPage() {
         name: category.name,
         slug: category.slug,
         description: category.description,
-        product_count: category.products?.length || 0, // Hitung jumlah produk
+        product_count: category.products?.length || 0,
+        image_url: category.image_url, // Hitung jumlah produk
       }))
     : []; // Kembalikan array kosong jika categories null
 

@@ -1,18 +1,33 @@
 // app/admin/categories/new/page.tsx
-"use client"; // Tetap sebagai Client Component
+"use client";
 
-import type React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import Image from "next/image";
+import { Loader2, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { ImageUpload } from "@/components/image-upload";
 import { useToast } from "@/hooks/use-toast";
-import { generateSlug } from "@/lib/utils"; // Tetap gunakan untuk preview slug di client
-import { createCategory } from "@/lib/action/category"; // <-- Impor Server Action
+import { createCategoryWithImage } from "@/lib/action/category";
+
+// Define state structure for images
+interface CategoryImageState {
+  id: string;
+  file: File;
+  alt: string;
+  previewUrl: string;
+}
 
 export default function NewCategoryPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -21,69 +36,91 @@ export default function NewCategoryPage() {
     slug: "",
     description: "",
   });
-  // const supabase = await createServerSupabaseClient(); // <-- HAPUS INI
+  const [categoryImage, setCategoryImage] = useState<CategoryImageState | null>(null);
 
   const { toast } = useToast();
   const router = useRouter();
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
+  // Clean up object URL when component unmounts or image changes
+  React.useEffect(() => {
+    if (categoryImage?.previewUrl) {
+      return () => {
+        URL.revokeObjectURL(categoryImage.previewUrl);
+      };
+    }
+  }, [categoryImage]);
 
-    // Update state form seperti biasa
-    // Tetap generate slug di client untuk UX (preview)
-    if (name === "name") {
-        const autoSlug = generateSlug(value);
-        setFormData((prev) => ({
-          ...prev,
-          [name]: value,
-          // Hanya update slug jika pengguna belum mengetik manual di slug
-          slug: prev.slug === generateSlug(prev.name) ? autoSlug : prev.slug,
-        }));
-    } else if (name === "slug") {
-         // Biarkan pengguna mengetik slug, tapi pastikan formatnya benar saat diubah
-         setFormData((prev) => ({
-            ...prev,
-            slug: generateSlug(value) // Pastikan slug selalu dalam format yang benar
-         }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+  // Form Field Handlers
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Image Handling Callbacks
+  const handleFileSelectedForUpload = (file: File | null) => {
+    if (file) {
+      // If there's already an image, revoke its URL first
+      if (categoryImage?.previewUrl) {
+        URL.revokeObjectURL(categoryImage.previewUrl);
+      }
+      
+      const newImage: CategoryImageState = {
+        id: crypto.randomUUID(),
+        file: file,
+        alt: file.name,
+        previewUrl: URL.createObjectURL(file),
+      };
+      setCategoryImage(newImage);
     }
   };
 
+  const handleRemoveImage = () => {
+    if (categoryImage?.previewUrl) {
+      URL.revokeObjectURL(categoryImage.previewUrl);
+    }
+    setCategoryImage(null);
+  };
+
+  // Generate slug from name
+  const generateSlugFromName = () => {
+    if (formData.name) {
+      const slug = formData.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+      setFormData((prev) => ({ ...prev, slug }));
+    }
+  };
+
+  // Form Submission Handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    try {
-      // Panggil Server Action dengan data dari state formData
-      const result = await createCategory({
-        name: formData.name,
-        slug: formData.slug, // Kirim slug dari state (bisa manual atau auto)
-        description: formData.description,
-      });
+    const submissionData = new FormData();
 
-      // Jika server action berhasil (tidak melempar error)
+    // Append all form data
+    submissionData.append("name", formData.name);
+    submissionData.append("slug", formData.slug);
+    submissionData.append("description", formData.description);
+
+    // Append image and alt text if available
+    if (categoryImage) {
+      submissionData.append("image", categoryImage.file, categoryImage.file.name);
+      submissionData.append("imageAlt", categoryImage.alt);
+    }
+
+    try {
+      const result = await createCategoryWithImage(submissionData);
       if (result.success) {
         toast({
-          title: "Category created",
+          title: "Category Created",
           description: `Category "${formData.name}" created successfully.`,
         });
-        router.push("/admin/categories"); // Arahkan ke daftar kategori
-        // router.refresh(); // Bisa ditambahkan jika revalidatePath dirasa kurang cepat
+        router.push("/admin/categories");
       }
-      // else {
-      //   // Handle jika action mengembalikan { success: false } (opsional)
-      //   throw new Error("Failed to create category for an unknown reason.");
-      // }
-
     } catch (error: any) {
-      // Tangkap error yang dilempar oleh Server Action
-      console.error("Submit error:", error);
+      console.error("Category creation failed:", error);
       toast({
-        title: "Error creating category",
-        description: error.message || "Something went wrong. Please try again.",
+        title: "Error",
+        description: error.message || "Something went wrong creating the category.",
         variant: "destructive",
       });
     } finally {
@@ -91,63 +128,141 @@ export default function NewCategoryPage() {
     }
   };
 
-  // --- Return JSX (tidak banyak berubah, tambahkan disable saat loading) ---
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-10">
+      {/* Page Header */}
       <div>
         <h2 className="text-3xl font-bold tracking-tight">New Category</h2>
         <p className="text-muted-foreground">
-          Create a new category for your products
+          Add details and an optional image for your new category.
         </p>
       </div>
 
+      {/* Form Start */}
       <form onSubmit={handleSubmit} className="space-y-8">
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Category Name</Label>
-            <Input
-              id="name"
-              name="name"
-              placeholder="Enter category name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              disabled={isLoading} // <-- Disable saat loading
-            />
-          </div>
+        {/* Category Details Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Category Details</CardTitle>
+            <CardDescription>
+              Enter information about the category.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Name & Slug Row */}
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="name">Category Name</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  placeholder="e.g., Electronics"
+                  value={formData.name}
+                  onChange={handleChange}
+                  onBlur={generateSlugFromName}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="slug">
+                  Slug
+                  <span className="text-xs text-muted-foreground ml-2">
+                    (auto-generated, editable)
+                  </span>
+                </Label>
+                <Input
+                  id="slug"
+                  name="slug"
+                  placeholder="e.g., electronics"
+                  value={formData.slug}
+                  onChange={handleChange}
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="slug">Slug</Label>
-            <Input
-              id="slug"
-              name="slug"
-              placeholder="category-slug"
-              value={formData.slug}
-              onChange={handleChange}
-              required // Slug sebaiknya required
-              disabled={isLoading} // <-- Disable saat loading
-            />
-            <p className="text-sm text-muted-foreground">
-              Unique identifier for the URL. Auto-generated, but can be customized.
-            </p>
-          </div>
+            {/* Description Row */}
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                name="description"
+                placeholder="Brief description of the category (optional)"
+                value={formData.description}
+                onChange={handleChange}
+                rows={3}
+                disabled={isLoading}
+              />
+            </div>
+          </CardContent>
+        </Card>
 
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              name="description"
-              placeholder="Enter category description (optional)"
-              value={formData.description}
-              onChange={handleChange}
-              rows={5}
-              disabled={isLoading} // <-- Disable saat loading
-            />
-          </div>
-        </div>
+        {/* Category Image Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Category Image</CardTitle>
+            <CardDescription>
+              Upload an image to represent this category (optional).
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="grid gap-4 grid-cols-2">
+                {/* Display existing image */}
+                {categoryImage && (
+                  <div className="relative group aspect-square">
+                    <div className="absolute inset-0 bg-background/60 backdrop-blur-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={handleRemoveImage}
+                        disabled={isLoading}
+                        aria-label="Remove this image"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <Image
+                      src={categoryImage.previewUrl}
+                      alt={categoryImage.alt || "Category image"}
+                      width={200}
+                      height={200}
+                      className="h-full w-full object-cover rounded-lg border"
+                      onError={(e) => {
+                        e.currentTarget.src = "/placeholder.svg"; // Fallback
+                      }}
+                    />
+                  </div>
+                )}
 
-        <div className="flex gap-2">
-          <Button type="submit" disabled={isLoading}>
+                {/* Upload new image slot */}
+                {!categoryImage && (
+                  <div className="aspect-square">
+                    <ImageUpload onFileSelected={handleFileSelectedForUpload} />
+                  </div>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Action Buttons */}
+        <div className="flex justify-end gap-3 pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.push("/admin/categories")}
+            disabled={isLoading}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            disabled={isLoading}
+          >
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -157,16 +272,9 @@ export default function NewCategoryPage() {
               "Create Category"
             )}
           </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.push("/admin/categories")}
-            disabled={isLoading} // <-- Disable saat loading
-          >
-            Cancel
-          </Button>
         </div>
       </form>
+      {/* Form End */}
     </div>
   );
 }
