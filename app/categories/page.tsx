@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { SiteHeader } from "@/components/site-header";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { error } from "console";
 
@@ -36,10 +35,8 @@ async function getProfile() {
 
 export default async function CategoriesPage() {
   const categories = await getCategories();
-  const profile = await getProfile()
   return (
     <>
-      <SiteHeader user={profile} />
       <main className="container py-12 md:py-16 lg:py-20">
         <div className="mb-10 text-center">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">

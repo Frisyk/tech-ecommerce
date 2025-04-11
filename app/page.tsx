@@ -30,7 +30,7 @@ export default async function Home() {
     .limit(4)
 
   // Fetch categories
-  const { data: categories } = await supabase.from("categories").select("id, name, slug").limit(4)
+  const { data: categories } = await supabase.from("categories").select("id, name, slug, image_url").limit(4)
 
   return (
     <>
@@ -106,13 +106,21 @@ export default async function Home() {
           <div className="container">
             <h2 className="text-3xl font-bold tracking-tight mb-8">Shop by Category</h2>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {categories?.map((category) => (
+            {categories?.map((category) => (
                 <Link
                   key={category.id}
                   href={`/categories/${category.slug}`}
-                  className="group relative flex h-60 items-end overflow-hidden rounded-lg bg-gray-100 p-6 shadow-lg"
+                  className="group relative flex items-end overflow-hidden rounded-lg p-6 shadow-lg bg-cover bg-center transition-transform duration-300 ease-in-out hover:scale-105 h-60 sm:h-72 md:h-80"
+                  style={{
+                    backgroundImage: category.image_url
+                      ? `url(${category.image_url})`
+                      : "linear-gradient(to right, #6366f1, #3b82f6)", // fallback gradient jika image_url kosong
+                  }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900/50 to-gray-900/0"></div>
+                  {/* Overlay gelap agar teks terbaca */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-black/10" />
+
+                  {/* Konten teks */}
                   <div className="relative z-10">
                     <h3 className="text-xl font-bold text-white">{category.name}</h3>
                     <span className="mt-1.5 inline-block text-xs font-medium text-white/90 underline-offset-2 group-hover:underline">
