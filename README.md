@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## 🛍️ Tech E-Commerce – Modern Full-Stack E-Commerce Platform
 
-## Getting Started
+**Tech E-Commerce** is a comprehensive full-stack e-commerce application designed to deliver a seamless shopping experience for both customers and administrators. Built using cutting-edge technologies, it emphasizes performance, scalability, and user-friendly interfaces.
 
-First, run the development server:
+### 🔧 Key Technologies
+
+- **Frontend** Developed with [Next.js](https://nextjs.org/), utilizing the App Router for efficient routing and server-side renderin.
+- **Styling** Implemented with Tailwind CSS for rapid and responsive UI developmen.
+- **State Management** Managed using Zustand, ensuring predictable and scalable state handlin.
+- **Authentication** Secured with NextAuth.js, providing robust user authentication mechanism.
+- **Database** Integrated with a relational database, managed via Prisma ORM for type-safe database interaction.
+- **Deployment** Hosted on Vercel, ensuring fast and reliable deliver.
+
+### 🛒 Core Features
+
+- **Product Catalog**: Displays a wide range of products with detailed information, allowing users to browse and search efficienty.
+- **Shopping Cart**: Enables users to add, remove, and manage products in their cart, with real-time updats.
+- **User Authentication**: Provides secure login and registration functionalities, ensuring personalized user experiencs.
+- **Order Management**: Allows users to place orders and view their order histoy.
+- **Admin Dashboard**: offering administrators tools to manage products, categories, and orders effectivey.
+
+### 📂 Repository Structure
+
+- *`app/`*: Contains the main application pages and routing loic.
+- *`components/`*: Houses reusable UI components, promoting modularty.
+- *`hooks/`*: Includes custom React hooks for encapsulating loic.
+- *`lib/`*: Contains utility functions and configuratins.
+- *`store/`*: Manages global state using Zustnd.
+- *`public/`*: Stores static assets like images and fots.
+
+### 🚀 Getting Started
+
+To run the project locally:
 
 ```bash
+git clone https://github.com/Frisyk/tech-ecommerce.git
+cd tech-ecommerce
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+``
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Then, open [http://localhost:3000](http://localhost:3000) in your browser to view the applicaion.
